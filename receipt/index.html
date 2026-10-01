@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>영수증 출력기</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="style.css?v=56">
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <div class="brand">
+        <img class="mark" src="../favicon.svg" alt="">
+        <div>
+          <strong>놀고<span>정산</span></strong>
+          <small>영수증 작성</small>
+        </div>
+        <a class="back-link" href="../index.html" aria-label="놀고정산으로 돌아가기"><span>‹</span> 크루로 돌아가기</a>
+      </div>
+
+      <div class="receipt-nav">
+        <div class="mode-switch" role="tablist" aria-label="영수증 종류">
+          <button class="active" data-mode="budget" type="button">예산 영수증</button>
+          <button data-mode="settlement" type="button">정산 영수증</button>
+        </div>
+        <a class="history-link" id="receiptHistoryLink" href="history.html">지난 영수증 <span>›</span></a>
+      </div>
+
+      <div class="editing-banner hidden" id="editingBanner" role="status">
+        <span>수정 중</span>
+        <strong id="editingReceiptTitle">기존 영수증</strong>
+        <small>수정한 내용은 같은 공유 링크에도 바로 반영돼요.</small>
+      </div>
+
+      <section class="editor">
+        <div class="editor-card info-card">
+          <div class="section-head">
+            <div><span class="step-label">01</span><h2>기본 정보</h2></div>
+            <button id="resetBtn" class="ghost" type="button">초기화</button>
+          </div>
+          <p class="section-description">영수증에 표시할 모임과 날짜를 입력해 주세요.</p>
+          <div class="grid">
+            <label class="wide-field">제목
+              <input id="titleInput" placeholder="예: 모임 정산 영수증">
+            </label>
+            <label>모임 / 프로젝트
+              <select id="eventInput"></select>
+            </label>
+            <label class="settlement-date-field">사용일
+              <input id="usedDateInput" type="date">
+            </label>
+            <label class="budget-date-field">사용예정일
+              <input id="plannedDateInput" type="date">
+            </label>
+            <label>작성자
+              <input id="writerInput" placeholder="작성자 이름">
+            </label>
+          </div>
+        </div>
+
+        <div class="editor-card items-card">
+          <div class="section-head item-head">
+            <div><span class="step-label">02</span><h2 id="itemsTitle">예산 항목</h2></div>
+            <span class="item-counter" id="editorItemCount">0개</span>
+          </div>
+          <p class="section-description">구매 내용과 금액을 추가하면 오른쪽 영수증에 바로 반영돼요.</p>
+
+          <div class="bulk-expense-box settlement-bulk hidden" id="settlementBulkBox">
+            <label>지출항목 빠른 입력
+              <textarea id="bulkExpenseInput" rows="8" placeholder="-모악산호랭이&#10;묵은지 파스타 1 12000&#10;&#10;-노래방&#10;12000&#10;&#10;-당구장&#10;10200"></textarea>
+            </label>
+            <p>-가게명을 적고 아래에 세부항목·수량·총금액을 입력하세요. 금액만 적으면 이용료로 등록돼요.</p>
+          </div>
+
+          <div id="itemsEditor" class="items-editor"></div>
+          <button id="addItemBtn" class="add-item-button" type="button"><span>＋</span> 항목 추가</button>
+        </div>
+
+        <div class="settlement-only hidden editor-card">
+          <div class="section-head">
+            <div><span class="step-label">03</span><h2>정산 정보</h2></div>
+          </div>
+          <div class="grid">
+            <label>정산 기준
+              <select id="splitTypeInput">
+                <option>1/N 정산</option>
+                <option>사용자 지정</option>
+                <option>공금 포함</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="editor-card memo-card">
+          <label class="memo-label">영수증 메모
+            <textarea id="memoInput" rows="3" placeholder="함께 볼 안내나 메모를 남겨주세요"></textarea>
+          </label>
+        </div>
+
+        <div class="editor-summary" aria-live="polite">
+          <div><span>합계</span><strong id="editorTotalText">0원</strong></div>
+          <p>입력한 항목의 총금액이에요</p>
+        </div>
+
+        <div class="actions">
+          <button id="draftSaveBtn" class="secondary" type="button">임시 저장</button>
+          <button id="expenseActionBtn" class="primary" type="button">발행하기</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="toolbar">
+        <div>
+          <span class="eyebrow">실시간 미리보기</span>
+          <h1 id="workspaceTitle">예산 영수증</h1>
+        </div>
+        <div class="status"><span></span> 자동 저장됨</div>
+      </div>
+
+      <article class="receipt-wrap">
+        <div class="receipt" id="receipt">
+          <div class="receipt-top"></div>
+          <header class="receipt-header">
+            <div class="receipt-logo"><b id="receiptLogo">영수증</b><span>NOLGO</span></div>
+            <h2 id="receiptTitle">영수증</h2>
+            <p id="receiptSubtitle">모임 / 프로젝트</p>
+          </header>
+
+          <div class="receipt-meta">
+            <div><span>사용일</span><strong id="receiptUsedDate"></strong></div>
+            <div><span>사용예정일</span><strong id="receiptPlannedDate"></strong></div>
+            <div><span>작성자</span><strong id="receiptWriter">-</strong></div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="receipt-table">
+            <div class="receipt-row receipt-row-head" id="receiptTableHead">
+              <span>내용</span>
+              <span>금액</span>
+            </div>
+            <div id="receiptItems"></div>
+          </div>
+
+          <div class="receipt-divider"></div>
+
+          <div class="totals">
+            <div class="grand"><span>총 합계</span><strong id="grandTotalText">0원</strong></div>
+          </div>
+
+          <div class="stamp-area">
+            <div>
+              <span>확인 메모</span>
+              <p id="receiptMemo">확인 후 보관해 주세요.</p>
+            </div>
+            <div class="stamp"><img src="assets/confirm-stamp.png" alt="확인 서명"></div>
+          </div>
+
+          <footer class="receipt-footer">
+            <div class="barcode"></div>
+          </footer>
+          <div class="receipt-bottom"></div>
+        </div>
+      </article>
+
+      <article class="receipt-wrap transfer-wrap hidden" id="transferReceiptWrap">
+        <div class="receipt transfer-receipt" id="transferReceipt">
+          <div class="receipt-top"></div>
+          <header class="receipt-header">
+            <div class="receipt-logo"><b>송금용 정산 영수증</b><span>NOLGO</span></div>
+            <h2>송금 내역</h2>
+            <p id="transferSubtitle">모임 / 프로젝트</p>
+          </header>
+          <div class="receipt-meta">
+            <div><span>사용일</span><strong id="transferDate">-</strong></div>
+            <div><span>기준</span><strong>상호 차감 후</strong></div>
+          </div>
+          <div class="receipt-divider"></div>
+          <div id="transferItems"></div>
+          <div class="receipt-divider"></div>
+          <div class="totals">
+            <div class="grand"><span>송금 합계</span><strong id="transferTotalText">0원</strong></div>
+          </div>
+          <div class="receipt-bottom"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="publish-success hidden" id="publishSuccess" role="dialog" aria-modal="true" aria-labelledby="publishSuccessTitle">
+    <div class="publish-success-card">
+      <div class="publish-success-icon">✓</div>
+      <div class="publish-success-title" id="publishSuccessTitle">영수증이 발행되었습니다</div>
+      <div class="publish-success-sub" id="publishSuccessSub"></div>
+      <div class="publish-success-actions">
+        <button id="publishShareBtn" class="secondary" type="button">영수증 링크 공유</button>
+        <button id="publishConfirmBtn" class="primary" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="item-modal hidden" id="itemEditDialog" role="dialog" aria-modal="true" aria-labelledby="itemEditTitle">
+    <div class="item-modal-card">
+      <div class="section-head">
+        <h2 id="itemEditTitle">지출항목 수정</h2>
+        <button id="closeItemEditBtn" class="ghost" type="button">닫기</button>
+      </div>
+      <div class="edit-grid">
+        <label>구매 내용
+          <input id="editItemName">
+        </label>
+        <label>금액
+          <input id="editItemAmount" inputmode="numeric">
+        </label>
+        <label>수량
+          <input id="editItemQuantity" inputmode="numeric" min="1" value="1">
+        </label>
+        <label class="hidden">누가 냈나요?
+          <input id="editItemPayer" placeholder="이름 또는 공금">
+        </label>
+      </div>
+      <div class="quantity-breakdown hidden" id="quantityBreakdown">
+        <div class="member-picker">
+          <span>수량별 항목</span>
+          <div class="quantity-lines" id="quantityLines"></div>
+        </div>
+      </div>
+      <div class="member-picker">
+        <span>누가 냈나요?</span>
+        <div class="receipt-member-choices" id="editPayerChoices"></div>
+      </div>
+      <div class="member-picker">
+        <span>누가 사용했나요?</span>
+        <div class="receipt-member-choices" id="editMemberChoices"></div>
+      </div>
+      <label class="complete-check proxy-toggle">
+        <input id="editItemProxyEnabled" type="checkbox">
+        대신 결제
+      </label>
+      <div class="member-picker proxy-picker hidden" id="proxyPicker">
+        <span>N빵 부담할 사람</span>
+        <div class="receipt-member-choices" id="editProxyChoices"></div>
+        <span>대신 결제 대상</span>
+        <div class="receipt-member-choices" id="editProxyForChoices"></div>
+        <p>대신 결제 대상은 영수증에 “이름 (대신 결제)”로 남고, 대신 내주는 사람끼리 N빵돼요.</p>
+      </div>
+      <label class="complete-check">
+        <input id="editItemCompleted" type="checkbox">
+        지출완료 체크
+      </label>
+      <label>설명
+        <input id="editItemNote" placeholder="영수증에 작게 표시될 메모">
+      </label>
+      <button id="deleteEditingItemBtn" class="danger-action" type="button">이 항목 삭제</button>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=73"></script>
+</body>
+</html>

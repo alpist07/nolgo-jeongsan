@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지난 영수증</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="style.css?v=56">
+</head>
+<body class="history-page">
+  <main class="history-shell">
+    <header class="history-header">
+      <a class="history-back" id="historyBack" href="index.html" aria-label="영수증 작성으로 돌아가기">‹</a>
+      <div>
+        <span>놀고정산</span>
+        <h1>지난 영수증</h1>
+      </div>
+    </header>
+    <div class="history-tabs" role="tablist" aria-label="영수증 종류">
+      <button class="active" data-history-mode="all" type="button">전체</button>
+      <button data-history-mode="settlement" type="button">정산</button>
+      <button data-history-mode="budget" type="button">예산</button>
+    </div>
+    <section class="history-list" id="historyList" aria-live="polite">
+      <div class="history-empty">영수증을 불러오는 중입니다.</div>
+    </section>
+  </main>
+  <script type="module" src="history.js?v=6"></script>
+</body>
+</html>

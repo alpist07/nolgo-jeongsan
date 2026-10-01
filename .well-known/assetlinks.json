@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nolgo",
+      "sha256_cert_fingerprints": [
+        "27:86:40:B7:82:09:03:B5:CE:A6:F2:9B:30:EA:58:8A:F3:A2:AE:0F:11:08:FD:1B:92:A4:C2:84:3F:D2:4E:AF"
+      ]
+    }
+  }
+]

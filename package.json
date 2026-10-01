@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "npx netlify dev",
+    "build": "echo Static site"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^27.1.1"
+  }
+}

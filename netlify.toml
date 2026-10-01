@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/share/receipt"
+  to = "/.netlify/functions/receipt-share"
+  status = 200
+
+# The app's WebView fetch()es this manifest and downloads this APK from a
+# different origin than the app itself runs under — without an explicit
+# CORS allow header, the browser/WebView blocks the app from reading the
+# response even though the file loads fine.
+[[headers]]
+  for = "/android-latest.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/nolgo-latest.apk"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
