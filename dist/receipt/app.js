@@ -120,9 +120,12 @@ const firebaseRequest = async (path, options) => {
 const firebaseGet = async (path) => {
   if (isReadonly && path.startsWith("receipts/")) {
     const receiptId = path.slice("receipts/".length);
-    const response = await fetch(`/.netlify/functions/receipt-share?id=${encodeURIComponent(receiptId)}&data=1`);
-    if (!response.ok) throw new Error("Public receipt read failed");
-    return response.json();
+    try {
+      const response = await fetch(`/.netlify/functions/receipt-share?id=${encodeURIComponent(receiptId)}&data=1`);
+      if (response.ok) return await response.json();
+    } catch {
+      /* fallback to direct firebase request */
+    }
   }
   const response = await firebaseRequest(path);
   if (!response.ok) throw new Error("Firebase read failed");
@@ -245,7 +248,8 @@ function readLinkedState() {
 function buildShareUrl() {
   const params = new URLSearchParams({ id: state.receiptId });
   if (roomId) params.set("room", roomId);
-  return `${location.origin}/share/receipt?${params.toString()}`;
+  const basePath = location.pathname.replace(/\/receipt\/[^/]*$/, "/receipt/");
+  return `${location.origin}${basePath}view.html?${params.toString()}`;
 }
 
 async function copyReceiptLink(button, resetText) {

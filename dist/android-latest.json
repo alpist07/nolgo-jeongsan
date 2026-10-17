@@ -1,6 +1,6 @@
 {
-  "versionCode": 8,
-  "versionName": "1.7",
-  "apkUrl": "https://nolgo.netlify.app/nolgo-latest.apk",
-  "notes": "영수증 수량(1개도 표시) 수정"
+  "versionCode": 9,
+  "versionName": "1.8",
+  "apkUrl": "https://alpist07.github.io/nolgo-jeongsan/nolgo-latest.apk",
+  "notes": "GitHub 배포 및 초대 링크 업데이트"
 }
